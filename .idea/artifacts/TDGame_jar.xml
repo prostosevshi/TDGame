@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TDGame:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/TDGame_jar</output-path>
+    <root id="archive" name="TDGame.jar">
+      <element id="module-output" name="TDGame" />
+    </root>
+  </artifact>
+</component>

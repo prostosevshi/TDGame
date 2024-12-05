@@ -3,12 +3,44 @@ package helpz;
 import objects.PathPoint;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class LoadSave {
+
+    public static String homePath = System.getProperty("user.home");
+    public static String saveFolder = "save";
+    public static String levelFile = "level.txt";
+    public static String filepath = homePath + File.separator + saveFolder + File.separator + levelFile;
+    private static File lvlFile = new File(filepath);
+
+    public static void createFolder() {
+        File folder = new File(homePath + File.separator + saveFolder);
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+    }
+
+    public static void createLevel(int[] idArr) {
+
+        if (lvlFile.exists()) {
+            System.out.println("File " + lvlFile + " already exists");
+            return;
+        } else {
+            try {
+                lvlFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            writeToFile(idArr, new PathPoint(0, 0), new PathPoint(0, 0));
+        }
+    }
 
     public static BufferedImage getSpriteAtlas() {
 
@@ -23,35 +55,28 @@ public class LoadSave {
         return img;
     }
 
-    public static void createFile() {
-        File txtFile = new File("res/newLevel.txt");
+    public static AudioInputStream getMusic() {
+        AudioInputStream audioStream = null;
+        // Access the audio file from the resources folder
+        InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("sickness.wav");
 
         try {
-            txtFile.createNewFile();
-        } catch (IOException e) {
+            // Read the audio input stream
+            if (is != null) {
+                audioStream = AudioSystem.getAudioInputStream(is);
+            } else {
+                System.out.println("Music file not found: ");
+            }
+        } catch (UnsupportedAudioFileException | IOException e) {
             e.printStackTrace();
         }
+
+        return audioStream;
     }
 
-    public static void createLevel(String name, int[] idArr) {
-        File newLevel = new File("res/" + name + ".txt");
-
-        if (newLevel.exists()) {
-            System.out.println("File " + name + " already exists");
-        } else {
-            try {
-                newLevel.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            writeToFile(newLevel, idArr, new PathPoint(0, 0), new PathPoint(0, 0));
-        }
-    }
-
-    private static void writeToFile(File f, int[] idArr, PathPoint start, PathPoint end) {
+    private static void writeToFile(int[] idArr, PathPoint start, PathPoint end) {
         try {
-            PrintWriter pw = new PrintWriter(f);
+            PrintWriter pw = new PrintWriter(lvlFile);
             for (Integer i : idArr)
                 pw.println(i);
             pw.println(start.getxCord());
@@ -65,11 +90,11 @@ public class LoadSave {
         }
     }
 
-    private static ArrayList<Integer> readFromFile(File file) {
+    private static ArrayList<Integer> readFromFile() {
         ArrayList<Integer> list = new ArrayList<>();
 
         try {
-            Scanner sc = new Scanner(file);
+            Scanner sc = new Scanner(lvlFile);
 
             while (sc.hasNextLine()) {
                 list.add(Integer.parseInt(sc.nextLine()));
@@ -81,41 +106,38 @@ public class LoadSave {
         return list;
     }
 
-    public static void saveLevel(String name, int[][] idArr, PathPoint start, PathPoint end) {
-        File levelFile = new File("res/" + name + ".txt");
+    public static void saveLevel(int[][] idArr, PathPoint start, PathPoint end) {
 
-        if (levelFile.exists()) {
-            writeToFile(levelFile, Utilz.twoDTo1DIntArr(idArr), start, end);
+        if (lvlFile.exists()) {
+            writeToFile(Utilz.twoDTo1DIntArr(idArr), start, end);
         } else {
-            System.out.println("File " + name + " does not exist");
+            System.out.println("File " + lvlFile + " does not exist");
             return;
         }
     }
 
-    public static int[][] getLevelData(String name) {
-        File lvlFile = new File("res/" + name + ".txt");
+    public static int[][] getLevelData() {
 
         if (lvlFile.exists()) {
-            ArrayList<Integer> list = readFromFile(lvlFile);
+            ArrayList<Integer> list = readFromFile();
             return Utilz.arrayListTo2DInt(list, 20, 20);
         } else {
-            System.out.println("File " + name + " does not exist");
+            System.out.println("File " + lvlFile + " does not exist");
             return null;
         }
     }
 
-    public static ArrayList<PathPoint> getLevelPathPoints(String name) {
-        File lvlFile = new File("res/" + name + ".txt");
+    public static ArrayList<PathPoint> getLevelPathPoints() {
 
         if (lvlFile.exists()) {
-            ArrayList<Integer> list = readFromFile(lvlFile);
+            ArrayList<Integer> list = readFromFile();
             ArrayList<PathPoint> points = new ArrayList<>();
             points.add(new PathPoint(list.get(400), list.get(401)));
             points.add(new PathPoint(list.get(402), list.get(403)));
 
             return points;
         } else {
-            System.out.println("File " + name + " does not exist");
+            System.out.println("File " + lvlFile + " does not exist");
             return null;
         }
     }

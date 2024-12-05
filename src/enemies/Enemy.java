@@ -1,6 +1,7 @@
 package enemies;
 
 import helpz.Constants;
+import managers.EnemyManager;
 
 import java.awt.*;
 
@@ -17,13 +18,15 @@ public abstract class Enemy {
     protected boolean alive = true;
     protected int slowTickLimit = 120;
     protected int slowTick = slowTickLimit;
+    protected EnemyManager enemyManager;
 
 
-    public Enemy(float x, float y, int id, int enemyType) {
+    public Enemy(float x, float y, int id, int enemyType, EnemyManager enemyManager) {
         this.x = x;
         this.y = y;
         this.ID = id;
         this.enemyType = enemyType;
+        this.enemyManager = enemyManager;
         bounds = new Rectangle((int) x, (int) y, 32, 32);
         lastDir = 1;
         setStartHealth();
@@ -42,6 +45,7 @@ public abstract class Enemy {
         this.health -= dmg;
         if (this.health <= 0) {
             alive = false;
+            enemyManager.rewardPlayer(enemyType);
         }
     }
 
@@ -118,5 +122,10 @@ public abstract class Enemy {
 
     public boolean isSlowed() {
         return slowTick < slowTickLimit;
+    }
+
+    public void kill() {
+        alive = false;
+        health = 0;
     }
 }

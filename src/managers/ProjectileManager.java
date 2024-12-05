@@ -83,8 +83,8 @@ public class ProjectileManager {
                         explosions.add(new Explosion(p.getPos()));
                         explodeOnEnemies(p);
                     }
-                } else {
-
+                } else if (isProjOutsideBounds(p)) {
+                    p.setActive(false);
                 }
             }
         }
@@ -94,10 +94,19 @@ public class ProjectileManager {
         }
     }
 
+    private boolean isProjOutsideBounds(Projectile p) {
+        if (p.getPos().x >= 0)
+            if (p.getPos().x <= 640)
+                if (p.getPos().y >= 0)
+                    if (p.getPos().y <= 800)
+                        return false;
+        return true;
+    }
+
     private void explodeOnEnemies(Projectile p) {
         for (Enemy e : playing.getEnemyManager().getEnemies()) {
             if (e.isAlive()) {
-                float radius = 40.0f;
+                float radius = 70.0f;
                 float xDist = Math.abs(p.getPos().x - e.getX());
                 float yDist = Math.abs(p.getPos().y - e.getY());
 
@@ -115,7 +124,7 @@ public class ProjectileManager {
             if (e.isAlive()) {
                 if (e.getBounds().contains(p.getPos())) {
                     e.hurt(p.getDmg());
-                    if(p.getProjectileType()==CHAINS){
+                    if (p.getProjectileType() == CHAINS) {
                         e.slow();
                     }
                     return true;
@@ -154,7 +163,14 @@ public class ProjectileManager {
             }
         }
 
-
+        for (Projectile p : projectiles) {
+            if (!p.isActive()) {
+                if (p.getProjectileType() == type) {
+                    p.reuse(t.getX() + 16, t.getY() + 16, xSpeed, ySpeed, t.getDmg(), rotate);
+                    return;
+                }
+            }
+        }
         projectiles.add(new Projectile(t.getX() + 16, t.getY() + 16, xSpeed, ySpeed, t.getDmg(), rotate, proj_id++, type));
     }
 
@@ -193,6 +209,12 @@ public class ProjectileManager {
         public Point2D.Float getPos() {
             return pos;
         }
+    }
+
+    public void reset() {
+        projectiles.clear();
+        explosions.clear();
+        proj_id = 0;
     }
 }
 

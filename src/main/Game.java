@@ -2,12 +2,14 @@ package main;
 
 import helpz.LoadSave;
 import managers.TileManager;
-import scenes.Editing;
-import scenes.Menu;
-import scenes.Playing;
-import scenes.Settings;
+import scenes.*;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.*;
+import java.io.File;
 
 public class Game extends JFrame implements Runnable {
 
@@ -24,17 +26,21 @@ public class Game extends JFrame implements Runnable {
     private Playing playing;
     private Settings settings;
     private Editing editing;
+    private GameOver gameOver;
 
     private TileManager tileManager;
 
     public Game() {
 
+        LoadSave.createFolder();
+        createDefaultLevel();
+
         initClasses();
 
-        createDefaultLevel();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        setTitle("TDGame");
         add(gameScreen);
         pack();
         setVisible(true);
@@ -48,10 +54,12 @@ public class Game extends JFrame implements Runnable {
         playing = new Playing(this);
         settings = new Settings(this);
         editing = new Editing(this);
+        gameOver = new GameOver(this);
     }
 
     private void start() {
-        gameThread = new Thread(this){};
+        gameThread = new Thread(this) {
+        };
 
         gameThread.start();
     }
@@ -76,6 +84,7 @@ public class Game extends JFrame implements Runnable {
         Game game = new Game();
         game.gameScreen.initInputs();
         game.start();
+
     }
 
     private void createDefaultLevel() {
@@ -84,7 +93,7 @@ public class Game extends JFrame implements Runnable {
             arr[i] = 0;
         }
 
-        LoadSave.createLevel("newLevel", arr);
+        LoadSave.createLevel(arr);
     }
 
     @Override
@@ -102,23 +111,23 @@ public class Game extends JFrame implements Runnable {
 
         long now;
 
-        while(true) {
+        while (true) {
 
             now = System.nanoTime();
             //Render
-            if(now - lastFrame >= timePerFrame) {
+            if (now - lastFrame >= timePerFrame) {
                 repaint();
                 lastFrame = now;
                 frames++;
             }
             //Update
-            if(now - lastUpdate > timePerUpdate) {
+            if (now - lastUpdate > timePerUpdate) {
                 updateGame();
                 lastUpdate = now;
                 updates++;
             }
 
-            if(System.currentTimeMillis() - lastTimeCheck >= 1000) {
+            if (System.currentTimeMillis() - lastTimeCheck >= 1000) {
                 System.out.println("FPS= " + frames + " | UPS= " + updates);
                 frames = 0;
                 updates = 0;
@@ -150,5 +159,46 @@ public class Game extends JFrame implements Runnable {
 
     public TileManager getTileManager() {
         return tileManager;
+    }
+
+    public GameOver getGameOver() {
+        return gameOver;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////
+    //music
+    /////////////////////////////////////////////////////////////////////////////
+    private Clip musicClip;
+    private FloatControl volumeControl;
+
+    public void playMusic() {
+        new Thread(() -> {
+            try {
+                AudioInputStream audioStream = LoadSave.getMusic();
+                musicClip = AudioSystem.getClip();
+                musicClip.open(audioStream);
+                musicClip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the music
+                musicClip.start();
+
+                volumeControl = (FloatControl) musicClip.getControl(FloatControl.Type.MASTER_GAIN);
+                setVolume(-20.0f); // Set default volume
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    public void setVolume(float volume) {
+        // Volume range is typically -80.0 (mute) to 6.0 (max volume)
+        if (volumeControl != null) {
+            volumeControl.setValue(volume);
+        }
+    }
+
+    public void stopMusic() {
+        if (musicClip != null && musicClip.isRunning()) {
+            musicClip.stop();
+        }
     }
 }

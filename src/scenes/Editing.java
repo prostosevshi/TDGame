@@ -43,12 +43,12 @@ public class Editing extends GameScene implements SceneMethods {
     }
 
     private void drawPathPoints(Graphics g) {
-        if(start != null) {
-            g.drawImage(toolBar.getPathStartImg(), start.getxCord()*32, start.getyCord()*32, 32, 32, null);
+        if (start != null) {
+            g.drawImage(toolBar.getPathStartImg(), start.getxCord() * 32, start.getyCord() * 32, 32, 32, null);
         }
 
-        if(end != null) {
-            g.drawImage(toolBar.getPathEndPathImg(), end.getxCord()*32, end.getyCord()*32, 32, 32, null);
+        if (end != null) {
+            g.drawImage(toolBar.getPathEndPathImg(), end.getxCord() * 32, end.getyCord() * 32, 32, 32, null);
         }
     }
 
@@ -69,8 +69,8 @@ public class Editing extends GameScene implements SceneMethods {
     }
 
     private void loadDefaultLevel() {
-        lvl = LoadSave.getLevelData("newLevel");
-        ArrayList<PathPoint> points = LoadSave.getLevelPathPoints("newLevel");
+        lvl = LoadSave.getLevelData();
+        ArrayList<PathPoint> points = LoadSave.getLevelPathPoints();
         start = points.get(0);
         end = points.get(1);
     }
@@ -82,7 +82,7 @@ public class Editing extends GameScene implements SceneMethods {
     }
 
     public void saveLevel() {
-        LoadSave.saveLevel("newLevel", lvl, start, end);
+        LoadSave.saveLevel(lvl, start, end);
         getGame().getPlaying().setLevel(lvl);
     }
 
@@ -108,7 +108,7 @@ public class Editing extends GameScene implements SceneMethods {
             } else {
                 int id = lvl[tileY][tileX];
                 if (game.getTileManager().getTile(id).getTileType() == ROAD_TILE) {
-                    if(selectedTile.getId() == -1)
+                    if (selectedTile.getId() == -1)
                         start = new PathPoint(tileX, tileY);
                     else
                         end = new PathPoint(tileX, tileY);

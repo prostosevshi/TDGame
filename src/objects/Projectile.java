@@ -21,6 +21,16 @@ public class Projectile {
         this.projectileType = projectileType;
     }
 
+
+    public void reuse(int x, int y, float xSpeed, float ySpeed, int dmg, float rotate) {
+        pos = new Point2D.Float(x, y);
+        this.xSpeed = xSpeed;
+        this.ySpeed = ySpeed;
+        this.dmg = dmg;
+        this.rotation = rotate;
+        active = true;
+    }
+
     public void move() {
         pos.x += xSpeed;
         pos.y += ySpeed;

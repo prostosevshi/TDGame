@@ -31,10 +31,10 @@ public class EnemyManager {
 
         enemyImgs = new BufferedImage[4];
 
-        addEnemy(ORC);
+        /*addEnemy(ORC);
         addEnemy(BAT);
         addEnemy(KNIGHT);
-        addEnemy(WOLF);
+        addEnemy(WOLF);*/
 
         loadEnemyImgs();
     }
@@ -67,7 +67,8 @@ public class EnemyManager {
         if (getTileType(newX, newY) == ROAD_TILE) {
             e.move(getSpeed(e.getEnemyType()), e.getLastDir());
         } else if (isAtEnd(e)) {
-            System.out.println("Lives lost!");
+            e.kill();
+            playing.removeOneLife();
         } else {
             setNewDirectionAndMove(e);
         }
@@ -83,7 +84,6 @@ public class EnemyManager {
 
         if (isAtEnd(e))
             return;
-
 
         if (dir == LEFT || dir == RIGHT) {
             int newY = (int) (e.getY() + getSpeedAndHeight(UP, e.getEnemyType()));
@@ -164,16 +164,16 @@ public class EnemyManager {
 
         switch (enemyType) {
             case ORC:
-                enemies.add(new Orc(x, y, 0));
+                enemies.add(new Orc(x, y, 0, this));
                 break;
             case BAT:
-                enemies.add(new Bat(x, y, 0));
+                enemies.add(new Bat(x, y, 0, this));
                 break;
             case KNIGHT:
-                enemies.add(new Knight(x, y, 0));
+                enemies.add(new Knight(x, y, 0, this));
                 break;
             case WOLF:
-                enemies.add(new Wolf(x, y, 0));
+                enemies.add(new Wolf(x, y, 0, this));
                 break;
         }
     }
@@ -209,5 +209,27 @@ public class EnemyManager {
 
     public ArrayList<Enemy> getEnemies() {
         return enemies;
+    }
+
+    public void spawnEnemy(int nextEnemy) {
+        addEnemy(nextEnemy);
+    }
+
+    public int getAmountOfAliveEnemies() {
+        int size = 0;
+        for (Enemy e : enemies) {
+            if (e.isAlive()) {
+                size++;
+            }
+        }
+        return size;
+    }
+
+    public void rewardPlayer(int enemyType) {
+        playing.rewardPlayer(enemyType);
+    }
+
+    public void reset() {
+        enemies.clear();
     }
 }

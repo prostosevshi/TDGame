@@ -34,12 +34,26 @@ public class Constants {
         public static final int KNIGHT = 2;
         public static final int WOLF = 3;
 
+        public static int getReward(int enemyType) {
+            switch (enemyType) {
+                case ORC:
+                    return 10;
+                case BAT:
+                    return 5;
+                case KNIGHT:
+                    return 25;
+                case WOLF:
+                    return 5;
+            }
+            return 0;
+        }
+
         public static float getSpeed(int enemyType) {
             switch (enemyType) {
                 case ORC:
-                    return 0.5f;
+                    return 0.6f;
                 case BAT:
-                    return 0.65f;
+                    return 0.9f;
                 case KNIGHT:
                     return 0.3f;
                 case WOLF:
@@ -51,7 +65,7 @@ public class Constants {
         public static int GetStartHealth(int enemyType) {
             switch (enemyType) {
                 case ORC:
-                    return 100;
+                    return 120;
                 case BAT:
                     return 60;
                 case KNIGHT:
@@ -73,6 +87,18 @@ public class Constants {
         public static final int CANNON = 0;
         public static final int ARCHER = 1;
         public static final int WIZARD = 2;
+
+        public static int getTowerCost(int towerType){
+            switch (towerType) {
+                case CANNON:
+                    return 65;
+                case ARCHER:
+                    return 30;
+                case WIZARD:
+                    return 45;
+            }
+            return 0;
+        }
 
         public static String getName(int towerType) {
             switch (towerType) {

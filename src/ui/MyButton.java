@@ -35,6 +35,10 @@ public class MyButton {
         this.bounds = new Rectangle(x, y, width, height);
     }
 
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public void draw(Graphics g) {
 
         drawBody(g);
